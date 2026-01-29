@@ -90,7 +90,7 @@ import q081 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q081';
 import q082 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q082';
 import q083 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q083';
 import q084 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q084';
-import q085 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q085';
+import q085 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q085.js';
 import q086 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q086';
 import q087 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q087';
 import q088 from './all_qs/09.Doubt_Deconstruction_and_Evangelism/q088';
