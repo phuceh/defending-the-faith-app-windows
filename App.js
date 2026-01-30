@@ -1,7 +1,5 @@
 import 'react-native-gesture-handler';
-
 import React, { useRef, useEffect, useState, createContext, useContext, useMemo } from 'react';
-
 import {
   Text,
   View,
@@ -24,13 +22,9 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { NavigationContainer } from '@react-navigation/native';
-
 import { createDrawerNavigator, useDrawerStatus } from '@react-navigation/drawer';
-
 import questions from './questions';
 
 const Drawer = createDrawerNavigator();
@@ -68,7 +62,7 @@ const QUESTION_THEMES = {
 const ThemeContext = createContext();
 const FontSizeContext = createContext();
 const ReadQuestionsContext = createContext();
-const FavoritesContext = createContext();
+const FavouritesContext = createContext();
 const NotesContext = createContext();
 const LastQuestionContext = createContext();
 
@@ -145,7 +139,7 @@ function QuestionScreen({ route }) {
   const { fontSize } = useContext(FontSizeContext);
   const { isDarkTheme } = useContext(ThemeContext);
   const { readQuestions, addReadQuestion } = useContext(ReadQuestionsContext);
-  const { favorites, toggleFavorite } = useContext(FavoritesContext);
+  const { favourites, toggleFavourite } = useContext(FavouritesContext);
   const { notes, updateNote } = useContext(NotesContext);
   const { setLastQuestion } = useContext(LastQuestionContext);
   const drawerStatus = useDrawerStatus();
@@ -158,7 +152,8 @@ function QuestionScreen({ route }) {
   const dividerColor = isDarkTheme ? '#404040' : '#e0e0e0';
   const cardBackground = isDarkTheme ? '#2a2a2a' : COLORS.lightGray;
   const inputBackground = isDarkTheme ? '#333' : COLORS.white;
-  const isFavorite = favorites.includes(Question);
+
+  const isFavourite = favourites.includes(Question);
   const hasNote = notes[Question] && notes[Question].trim().length > 0;
 
   useEffect(() => {
@@ -179,7 +174,6 @@ function QuestionScreen({ route }) {
     // Match both **text** (bold + blue) and *text* (bold only)
     // Important: Match ** before * to avoid conflicts
     const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
-
     return parts.map((part, index) => {
       // Check for **text** pattern (bold + blue)
       if (part.startsWith('**') && part.endsWith('**')) {
@@ -230,9 +224,9 @@ function QuestionScreen({ route }) {
     };
   }, [Question, drawerStatus, readQuestions, addReadQuestion]);
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavourite = () => {
     Vibration.vibrate(20);
-    toggleFavorite(Question);
+    toggleFavourite(Question);
     // Animate star
     Animated.sequence([
       Animated.timing(starScale, {
@@ -266,7 +260,6 @@ function QuestionScreen({ route }) {
       Alert.alert('No Note', 'You haven\'t written any notes for this question yet.');
       return;
     }
-
     try {
       const message = `My notes on Q${Question + 1}: ${data.question}\n\n${notes[Question]}\n\n— Christian Apologetics App`;
       await Share.share({
@@ -291,10 +284,10 @@ function QuestionScreen({ route }) {
               {data.question}
             </Text>
             <TouchableOpacity
-              onPress={handleToggleFavorite}
+              onPress={handleToggleFavourite}
               style={styles.favoriteButton}
               accessible={true}
-              accessibilityLabel={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              accessibilityLabel={isFavourite ? "Remove from favourites" : "Add to favourites"}
               accessibilityRole="button"
               activeOpacity={0.7}
             >
@@ -304,7 +297,7 @@ function QuestionScreen({ route }) {
                   { transform: [{ scale: starScale }] }
                 ]}
               >
-                {isFavorite ? '★' : '☆'}
+                {isFavourite ? '★' : '☆'}
               </Animated.Text>
             </TouchableOpacity>
           </View>
@@ -356,7 +349,6 @@ function QuestionScreen({ route }) {
               accessibilityLabel="Personal notes input"
               accessibilityHint="Add your own notes about this question"
             />
-
             {hasNote && (
               <TouchableOpacity 
                 style={[styles.shareNoteButton, { marginTop: 12 }]}
@@ -378,7 +370,7 @@ function QuestionScreen({ route }) {
 
 function QuestionList({ navigation }) {
   const { readQuestions } = useContext(ReadQuestionsContext);
-  const { favorites } = useContext(FavoritesContext);
+  const { favourites } = useContext(FavouritesContext);
   const { isDarkTheme } = useContext(ThemeContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState('all');
@@ -441,7 +433,7 @@ function QuestionList({ navigation }) {
         const questionText = item.question.toLowerCase();
         const questionNumber = `q${item.originalIndex + 1}`;
         const matchesSearch = questionText.includes(searchLower) || questionNumber.includes(searchLower);
-        const matchesFilter = filterMode === 'all' || favorites.includes(item.originalIndex);
+        const matchesFilter = filterMode === 'all' || favourites.includes(item.originalIndex);
         return matchesSearch && matchesFilter;
       });
 
@@ -458,7 +450,7 @@ function QuestionList({ navigation }) {
     });
 
     return grouped;
-  }, [searchQuery, filterMode, favorites]);
+  }, [searchQuery, filterMode, favourites]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],
@@ -570,27 +562,27 @@ function QuestionList({ navigation }) {
         <TouchableOpacity
           onPress={() => {
             Vibration.vibrate(10);
-            setFilterMode('favorites');
+            setFilterMode('favourites');
           }}
           style={[
             styles.filterButton,
-            filterMode === 'favorites' && styles.filterButtonActive,
+            filterMode === 'favourites' && styles.filterButtonActive,
             { 
-              backgroundColor: filterMode === 'favorites' ? COLORS.navy : (isDarkTheme ? '#2a2a2a' : COLORS.white),
+              backgroundColor: filterMode === 'favourites' ? COLORS.navy : (isDarkTheme ? '#2a2a2a' : COLORS.white),
               borderColor: isDarkTheme ? '#404040' : '#e0e0e0',
             }
           ]}
           accessible={true}
-          accessibilityLabel={`Show favorites, ${favorites.length} items`}
+          accessibilityLabel={`Show favourites, ${favourites.length} items`}
           accessibilityRole="button"
           activeOpacity={0.7}
         >
           <Text style={[
             styles.filterButtonText,
-            filterMode === 'favorites' && styles.filterButtonTextActive,
-            { color: filterMode === 'favorites' ? COLORS.white : textColor }
+            filterMode === 'favourites' && styles.filterButtonTextActive,
+            { color: filterMode === 'favourites' ? COLORS.white : textColor }
           ]}>
-            ★ Favorites ({favorites.length})
+            ★ Favourites ({favourites.length})
           </Text>
         </TouchableOpacity>
       </View>
@@ -630,9 +622,7 @@ function QuestionList({ navigation }) {
           >
             <Text style={styles.scrollArrow}>▲</Text>
           </TouchableOpacity>
-
           <View style={{ flex: 1 }} />
-
           <TouchableOpacity
             style={styles.scrollButton}
             onPress={() => scrollToNextTheme('down')}
@@ -679,7 +669,7 @@ function QuestionList({ navigation }) {
             }
 
             const { originalIndex } = item;
-            const isFavorite = favorites.includes(originalIndex);
+            const isFavourite = favourites.includes(originalIndex);
             const isRead = readQuestions.includes(originalIndex);
 
             return (
@@ -691,7 +681,7 @@ function QuestionList({ navigation }) {
                 }}
                 style={[styles.QuestionButton, { borderBottomColor: isDarkTheme ? '#404040' : '#e0e0e0' }]}
                 accessible={true}
-                accessibilityLabel={`Question ${originalIndex + 1}: ${item.question}${isRead ? ', read' : ', unread'}${isFavorite ? ', favorited' : ''}`}
+                accessibilityLabel={`Question ${originalIndex + 1}: ${item.question}${isRead ? ', read' : ', unread'}${isFavourite ? ', favourited' : ''}`}
                 accessibilityRole="button"
                 accessibilityHint="Double tap to open this question"
                 activeOpacity={0.7}
@@ -706,7 +696,7 @@ function QuestionList({ navigation }) {
                   >
                     <Text style={{ fontWeight: '700' }}>Q{originalIndex + 1}</Text>. {item.question}
                   </Text>
-                  {isFavorite && (
+                  {isFavourite && (
                     <Text style={styles.favoriteIndicator}>★</Text>
                   )}
                 </View>
@@ -721,7 +711,7 @@ function QuestionList({ navigation }) {
 
 function StatsScreen() {
   const { readQuestions } = useContext(ReadQuestionsContext);
-  const { favorites } = useContext(FavoritesContext);
+  const { favourites } = useContext(FavouritesContext);
   const { notes } = useContext(NotesContext);
   const { isDarkTheme } = useContext(ThemeContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -743,7 +733,7 @@ function StatsScreen() {
   const themeStats = useMemo(() => {
     return Object.entries(QUESTION_THEMES).map(([themeName, questionIndices]) => {
       const readInTheme = questionIndices.filter(idx => readQuestions.includes(idx)).length;
-      const favoritesInTheme = questionIndices.filter(idx => favorites.includes(idx)).length;
+      const favouritesInTheme = questionIndices.filter(idx => favourites.includes(idx)).length;
       const notesInTheme = questionIndices.filter(idx => notes[idx] && notes[idx].trim().length > 0).length;
       const totalInTheme = questionIndices.length;
       const percentageRead = Math.round((readInTheme / totalInTheme) * 100);
@@ -751,13 +741,13 @@ function StatsScreen() {
       return {
         themeName,
         readInTheme,
-        favoritesInTheme,
+        favouritesInTheme,
         notesInTheme,
         totalInTheme,
         percentageRead,
       };
     });
-  }, [readQuestions, favorites, notes]);
+  }, [readQuestions, favourites, notes]);
 
   const shareProgress = async () => {
     try {
@@ -797,9 +787,9 @@ function StatsScreen() {
         </View>
 
         <View style={[styles.statCard, { backgroundColor: cardBackground }]}>
-          <Text style={[styles.statLabel, { color: textColor }]}>Favorites</Text>
+          <Text style={[styles.statLabel, { color: textColor }]}>Favourites</Text>
           <Text style={[styles.statValue, { color: COLORS.navy }]}>
-            ★ {favorites.length}
+            ★ {favourites.length}
           </Text>
         </View>
 
@@ -829,7 +819,6 @@ function StatsScreen() {
                 {theme.percentageRead}%
               </Text>
             </View>
-
             <View style={[styles.progressBarBackground, { marginTop: 6, width: '100%', height: 6 }]}>
               <View
                 style={[
@@ -841,7 +830,7 @@ function StatsScreen() {
 
             <View style={styles.themeStatDetails}>
               <Text style={[styles.themeStatDetailText, { color: textColor }]}>
-                ★ {theme.favoritesInTheme} favorited
+                ★ {theme.favouritesInTheme} favourited
               </Text>
               <Text style={[styles.themeStatDetailText, { color: textColor }]}>
                 {theme.notesInTheme} notes
@@ -869,7 +858,7 @@ function SettingsScreen({ navigation }) {
   const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
   const { fontSize, setFontSize } = useContext(FontSizeContext);
   const { readQuestions, resetReadQuestions } = useContext(ReadQuestionsContext);
-  const { favorites, setFavorites } = useContext(FavoritesContext);
+  const { favourites, setFavourites } = useContext(FavouritesContext);
   const { notes, setNotes } = useContext(NotesContext);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -909,11 +898,11 @@ function SettingsScreen({ navigation }) {
     );
   };
 
-  const resetFavorites = () => {
+  const resetFavourites = () => {
     Vibration.vibrate([0, 50, 50, 50]);
     Alert.alert(
-      'Clear Favorites',
-      'Are you sure you want to clear all your favorites?',
+      'Clear Favourites',
+      'Are you sure you want to clear all your favourites?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -921,12 +910,12 @@ function SettingsScreen({ navigation }) {
           style: 'destructive',
           onPress: async () => {
             try {
-              setFavorites([]);
-              await AsyncStorage.setItem('FAVORITES', JSON.stringify([]));
+              setFavourites([]);
+              await AsyncStorage.setItem('FAVOURITES', JSON.stringify([]));
               navigation.openDrawer();
             } catch (error) {
-              console.error('Error clearing favorites:', error);
-              Alert.alert('Error', 'Failed to clear favorites');
+              console.error('Error clearing favourites:', error);
+              Alert.alert('Error', 'Failed to clear favourites');
             }
           },
         },
@@ -1057,14 +1046,14 @@ function SettingsScreen({ navigation }) {
 
         <View style={[styles.settingCard, { backgroundColor: cardBackground }]}>
           <Text style={{ color: textColor, fontSize: 16, fontWeight: '600', marginBottom: 16 }}>
-            Favorites ({favorites.length})
+            Favourites ({favourites.length})
           </Text>
           <TouchableOpacity 
             style={styles.settingActionButton}
-            onPress={resetFavorites}
+            onPress={resetFavourites}
             activeOpacity={0.7}
           >
-            <Text style={styles.settingActionButtonText}>Clear Favorites</Text>
+            <Text style={styles.settingActionButtonText}>Clear Favourites</Text>
           </TouchableOpacity>
         </View>
 
@@ -1110,7 +1099,7 @@ export default function App() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [fontSize, setFontSize] = useState(18);
   const [readQuestions, setReadQuestions] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favourites, setFavourites] = useState([]);
   const [notes, setNotes] = useState({});
   const [lastQuestion, setLastQuestion] = useState(0);
   const [resetCounter, setResetCounter] = useState(0);
@@ -1119,11 +1108,11 @@ export default function App() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const [storedQuestions, storedTheme, storedFontSize, storedFavorites, storedNotes, storedLastQuestion] = await Promise.all([
+        const [storedQuestions, storedTheme, storedFontSize, storedFavourites, storedNotes, storedLastQuestion] = await Promise.all([
           AsyncStorage.getItem('READ_QUESTIONS'),
           AsyncStorage.getItem('DARK_THEME'),
           AsyncStorage.getItem('FONT_SIZE'),
-          AsyncStorage.getItem('FAVORITES'),
+          AsyncStorage.getItem('FAVOURITES'),
           AsyncStorage.getItem('NOTES'),
           AsyncStorage.getItem('LAST_QUESTION'),
         ]);
@@ -1131,7 +1120,7 @@ export default function App() {
         if (storedQuestions) setReadQuestions(JSON.parse(storedQuestions));
         if (storedTheme !== null) setIsDarkTheme(JSON.parse(storedTheme));
         if (storedFontSize) setFontSize(JSON.parse(storedFontSize));
-        if (storedFavorites) setFavorites(JSON.parse(storedFavorites));
+        if (storedFavourites) setFavourites(JSON.parse(storedFavourites));
         if (storedNotes) setNotes(JSON.parse(storedNotes));
         if (storedLastQuestion !== null) setLastQuestion(JSON.parse(storedLastQuestion));
       } catch (error) {
@@ -1152,10 +1141,10 @@ export default function App() {
   }, [readQuestions]);
 
   useEffect(() => {
-    AsyncStorage.setItem('FAVORITES', JSON.stringify(favorites)).catch(error => {
-      console.error('Error saving favorites:', error);
+    AsyncStorage.setItem('FAVOURITES', JSON.stringify(favourites)).catch(error => {
+      console.error('Error saving favourites:', error);
     });
-  }, [favorites]);
+  }, [favourites]);
 
   useEffect(() => {
     AsyncStorage.setItem('DARK_THEME', JSON.stringify(isDarkTheme)).catch(error => {
@@ -1183,8 +1172,8 @@ export default function App() {
 
   const toggleTheme = () => setIsDarkTheme((prev) => !prev);
 
-  const toggleFavorite = (questionIndex) => {
-    setFavorites((prev) =>
+  const toggleFavourite = (questionIndex) => {
+    setFavourites((prev) =>
       prev.includes(questionIndex)
         ? prev.filter((idx) => idx !== questionIndex)
         : [...prev, questionIndex]
@@ -1235,7 +1224,7 @@ export default function App() {
     <ThemeContext.Provider value={{ isDarkTheme, toggleTheme }}>
       <ReadQuestionsContext.Provider value={{ readQuestions, addReadQuestion, resetReadQuestions, setReadQuestions }}>
         <FontSizeContext.Provider value={{ fontSize, setFontSize }}>
-          <FavoritesContext.Provider value={{ favorites, setFavorites, toggleFavorite }}>
+          <FavouritesContext.Provider value={{ favourites, setFavourites, toggleFavourite }}>
             <NotesContext.Provider value={{ notes, updateNote, setNotes }}>
               <LastQuestionContext.Provider value={{ lastQuestion, setLastQuestion }}>
                 <NavigationContainer ref={navigationRef} key={resetCounter}>
@@ -1437,7 +1426,7 @@ export default function App() {
                 </NavigationContainer>
               </LastQuestionContext.Provider>
             </NotesContext.Provider>
-          </FavoritesContext.Provider>
+          </FavouritesContext.Provider>
         </FontSizeContext.Provider>
       </ReadQuestionsContext.Provider>
     </ThemeContext.Provider>
@@ -1707,7 +1696,7 @@ const styles = StyleSheet.create({
   filterButton: {
     flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 6,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: '#e0e0e0',
@@ -1726,7 +1715,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-  filterButtonText: { fontSize: 14, fontWeight: '600', letterSpacing: 0.2 },
+  filterButtonText: { fontSize: 13, fontWeight: '600', letterSpacing: 0.2 },
   filterButtonTextActive: { color: COLORS.white, fontWeight: '700' },
   searchContainer: {
     padding: 16,
