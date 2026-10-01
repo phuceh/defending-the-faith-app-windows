@@ -660,7 +660,7 @@ function QuestionList({ navigation }) {
           renderItem={({ item }) => {
             if (item.type === 'header') {
               return (
-                <View style={[styles.themeHeader, { backgroundColor: isDarkTheme ? '#1f1f1f' : '#e0e0e0' }]}>
+                <View style={[styles.themeHeader, { backgroundColor: isDarkTheme ? '#1f1f1f' : '#e0e0e0' }, Platform.OS === 'web' && { transform: [{ scaleY: -1 }] }]}>
                   <Text style={[styles.themeHeaderText, { color: COLORS.navy }]}>
                     {item.themeName}
                   </Text>
@@ -679,7 +679,7 @@ function QuestionList({ navigation }) {
                   navigation.navigate(`Question${originalIndex + 1}`, { Question: originalIndex });
                   navigation.closeDrawer();
                 }}
-                style={[styles.QuestionButton, { borderBottomColor: isDarkTheme ? '#404040' : '#e0e0e0' }]}
+                style={[styles.QuestionButton, { borderBottomColor: isDarkTheme ? '#404040' : '#e0e0e0' }, Platform.OS === 'web' && { transform: [{ scaleY: -1 }] }]}
                 accessible={true}
                 accessibilityLabel={`Question ${originalIndex + 1}: ${item.question}${isRead ? ', read' : ', unread'}${isFavourite ? ', favourited' : ''}`}
                 accessibilityRole="button"
