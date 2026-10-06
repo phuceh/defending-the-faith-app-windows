@@ -390,6 +390,8 @@ function QuestionList({ navigation }) {
     loadSearchHistory();
   }, []);
 
+  
+
   useEffect(() => {
     Animated.timing(progressAnim, {
       toValue: progress,
@@ -614,7 +616,7 @@ function QuestionList({ navigation }) {
         <View style={styles.verticalAccentLine}>
           <TouchableOpacity
             style={styles.scrollButton}
-            onPress={() => scrollToNextTheme('up')}
+            onPress={() => scrollToNextTheme(Platform.OS === 'web' ? 'down' : 'up')}
             activeOpacity={0.7}
             accessible={true}
             accessibilityLabel="Scroll to next theme"
@@ -625,7 +627,7 @@ function QuestionList({ navigation }) {
           <View style={{ flex: 1 }} />
           <TouchableOpacity
             style={styles.scrollButton}
-            onPress={() => scrollToNextTheme('down')}
+            onPress={() => scrollToNextTheme(Platform.OS === 'web' ? 'up' : 'down')}
             activeOpacity={0.7}
             accessible={true}
             accessibilityLabel="Scroll to previous theme"
@@ -640,7 +642,7 @@ function QuestionList({ navigation }) {
           style={{ flex: 1 }}
           data={groupedQuestions}
           keyExtractor={(item, index) => item.type === 'header' ? `header-${item.themeName}` : `question-${item.originalIndex}`}
-          inverted
+          inverted={Platform.OS !== 'web'}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{ paddingBottom: 20 }}
@@ -660,7 +662,7 @@ function QuestionList({ navigation }) {
           renderItem={({ item }) => {
             if (item.type === 'header') {
               return (
-                <View style={[styles.themeHeader, { backgroundColor: isDarkTheme ? '#1f1f1f' : '#e0e0e0' }, Platform.OS === 'web' && { transform: [{ scaleY: -1 }] }]}>
+                <View style={[styles.themeHeader, { backgroundColor: isDarkTheme ? '#1f1f1f' : '#e0e0e0' }]}>
                   <Text style={[styles.themeHeaderText, { color: COLORS.navy }]}>
                     {item.themeName}
                   </Text>
@@ -679,7 +681,7 @@ function QuestionList({ navigation }) {
                   navigation.navigate(`Question${originalIndex + 1}`, { Question: originalIndex });
                   navigation.closeDrawer();
                 }}
-                style={[styles.QuestionButton, { borderBottomColor: isDarkTheme ? '#404040' : '#e0e0e0' }, Platform.OS === 'web' && { transform: [{ scaleY: -1 }] }]}
+                style={[styles.QuestionButton, { borderBottomColor: isDarkTheme ? '#404040' : '#e0e0e0' }]}
                 accessible={true}
                 accessibilityLabel={`Question ${originalIndex + 1}: ${item.question}${isRead ? ', read' : ', unread'}${isFavourite ? ', favourited' : ''}`}
                 accessibilityRole="button"
@@ -1435,14 +1437,17 @@ export default function App() {
 
 const styles = StyleSheet.create({
   screenContainer: { flex: 1 },
-  contentContainer: { flexGrow: 1, padding: 24 },
-  statsContentContainer: { 
+    contentContainer: { flexGrow: 1, padding: 24, width: '100%', maxWidth: 760, alignSelf: 'center' },
+   statsContentContainer: { 
     flexGrow: 1, 
+    width: '100%',
+    maxWidth: 760,
+    alignSelf: 'center',
     padding: 20,
     paddingTop: 16,
     paddingBottom: 40,
   },
-  questionHeader: { padding: 24, paddingBottom: 12 },
+    questionHeader: { padding: 24, paddingBottom: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
   questionTitleRow: { 
     flexDirection: 'row', 
     alignItems: 'center',
